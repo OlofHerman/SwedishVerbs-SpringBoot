@@ -1,6 +1,7 @@
 package com.kastrup.swedishverbs.controller;
 
 import com.kastrup.swedishverbs.dto.VerbDTO;
+import com.kastrup.swedishverbs.exception.NotFoundException;
 import com.kastrup.swedishverbs.model.Verb;
 import com.kastrup.swedishverbs.service.VerbService;
 import io.swagger.annotations.ApiOperation;
@@ -35,10 +36,23 @@ public class VerbController {
         return verbService.findByClass(verbClass);
     }
 
+    @ApiOperation(value = "Get verb by ID")
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<Verb> findById(final @PathVariable long id) {
+        return verbService.findById(id).map(ResponseEntity::ok)
+                .orElseThrow(() -> new NotFoundException(id));
+    }
+
+    @ApiOperation(value = "Delete a verb")
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Verb> deleteVerb(final @PathVariable long id) {
+        return verbService.deleteVerb(id).map(ResponseEntity::ok)
+                .orElseThrow(() -> new NotFoundException(id));
+    }
+
     @ApiOperation(value = "Post a verb")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Verb> registerVerb(final @RequestBody VerbDTO newVerbDTO) {
-        Verb newVerb = verbService.registerVerb(newVerbDTO);
-        return new ResponseEntity<>(newVerb, HttpStatus.CREATED);
+        return new ResponseEntity<>(verbService.registerVerb(newVerbDTO), HttpStatus.CREATED);
     }
 }

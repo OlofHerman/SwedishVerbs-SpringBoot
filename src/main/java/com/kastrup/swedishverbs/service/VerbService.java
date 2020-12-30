@@ -6,6 +6,8 @@ import com.kastrup.swedishverbs.repository.VerbRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 public class VerbService {
@@ -38,5 +40,15 @@ public class VerbService {
                 .verbClass(newVerbDTO.getVerbClass())
                 .build();
         return verbRepository.save(newVerb);
+    }
+
+    public Optional<Verb> findById(final long id) {
+        return verbRepository.findById(id);
+    }
+
+    public Optional<Verb> deleteVerb(final long id) {
+        Optional<Verb> maybeVerb = verbRepository.findById(id);
+        maybeVerb.ifPresent(verbRepository::delete);
+        return maybeVerb;
     }
 }
