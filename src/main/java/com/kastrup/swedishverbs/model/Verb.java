@@ -11,6 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder
 public class Verb {
 
     @Id
