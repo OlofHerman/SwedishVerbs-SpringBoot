@@ -6,6 +6,7 @@ import com.kastrup.swedishverbs.model.Verb;
 import com.kastrup.swedishverbs.service.VerbService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,25 +16,22 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/verb")
+@AllArgsConstructor
 public class VerbController {
 
     private final VerbService verbService;
 
-    public VerbController(final VerbService verbService) {
-        this.verbService = verbService;
-    }
-
     @ApiOperation(value = "Get all verbs")
     @GetMapping(path = "/all")
-    public List<Verb> getAllVerbs() {
-        return verbService.getAllVerbs();
+    public ResponseEntity<List<Verb>> getAllVerbs() {
+        return new ResponseEntity<>(verbService.getAllVerbs(), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get verbs by class")
     @GetMapping
-    public List<Verb> findByClass(final @ApiParam(allowableValues = "I, II, III, IV, V, VI, VIj", defaultValue = "I")
+    public ResponseEntity<List<Verb>> findByClass(final @ApiParam(allowableValues = "I, II, III, IV, V, VI, VIj", defaultValue = "I")
                                       @RequestParam(value = "class") String verbClass) {
-        return verbService.findByClass(verbClass);
+        return new ResponseEntity<>(verbService.findByClass(verbClass), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get verb by ID")
@@ -54,5 +52,12 @@ public class VerbController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Verb> registerVerb(final @RequestBody VerbDTO newVerbDTO) {
         return new ResponseEntity<>(verbService.registerVerb(newVerbDTO), HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Update a verb")
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<Verb> updateVerb(final @PathVariable long id, final @RequestBody VerbDTO newVerbDTO) {
+        return verbService.updateVerb(id, newVerbDTO).map(ResponseEntity::ok)
+                .orElseThrow(() -> new NotFoundException(id));
     }
 }
